@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=JimBotDown
+Comment=Bear market
+Icon=/home/pi/Desktop/bot/JimBotDown/images/bear.png
+Path=/home/pi/Desktop/bot/JimBotDown/
+working-directory=/home/pi/Desktop/bot/JimBotDown/
+Exec=/usr/bin/python3 /home/pi/Desktop/bot/JimBotDown/Binance_Detect_Mooningsv1.py
+Type=Application
+Encoding=UTF-8
+Terminal=true
+Categories=None;
+X-KeepTerminal=true
+GenericName=Bear market
+StartupNotify=true
