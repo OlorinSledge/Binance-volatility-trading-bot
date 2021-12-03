@@ -1,5 +1,5 @@
 """
-The Snail v 2.2
+The Snail v 2.3
 "Buy the dips! ... then wait"
 
 STRATEGY
@@ -20,6 +20,9 @@ calculates Average True Range Percent (ATRP) as an alternative to the default mo
 
 * DROP_CALCULATION
 Potential calculation as drop in % from high-price of X-day. Default 'False' to align with scoobie's version
+
+* RSI_RANKING
+RSI based ranking of coins already selected with MACD
 
 STRATEGY SETTINGS
 LIMIT = 4
@@ -49,6 +52,8 @@ Thanks to
 @vyacheslav for optimising the code with async and adding list sorting,
 @Kevin.Butters for the meticulous testing and reporting,
 @OlorinSledge for the coding advice and a great fork
+
+v2.2, v2.3 by @ashwinprasad.me
 
 DISCLAIMER
 CHECK YOU HAVE ALL THE REQUIRED IMPORTS INSTALLED
@@ -138,6 +143,9 @@ percent_below = 0.6  # change risk level:  0.7 = 70% below high_price, 0.5 = 50%
 #  "ATR_MOVEMENT" for Average True Range Percentage calc
 MOVEMENT = 'MOVEMENT'
 DROP_CALCULATION = False
+
+# RSI based ranking of coins selected from MACD
+RSI_RANKING = False
 
 # Display Setttings
 all_info = True
@@ -324,6 +332,7 @@ def do_work():
 
 					if DROP_CALCULATION:
 						current_potential = current_drop
+						coins[coin]['current_potential'] = current_potential
 
 					if MOVEMENT == "MOVEMENT":
 						if profit_min < current_potential < profit_max and last_price < buy_below and movement >= (TAKE_PROFIT + 0.2) and coin not in held_coins_list:
@@ -373,6 +382,15 @@ def do_work():
 					get_hist1 = macd1.iloc[35, 1]
 					get_hist5 = macd5.iloc[35, 1]
 					get_hist15 = macd15.iloc[35, 1]
+
+					if RSI_RANKING:						
+						rsi = exchange.fetch_ohlcv(coin, timeframe='1h', limit=36)
+						dfrsi = pd.DataFrame(rsi, columns=['time', 'open', 'high', 'low', 'close', 'volume'])
+						rsi = ta.rsi(dfrsi["close"])
+						get_rsi = rsi.iloc[-1]
+						coins[coin]['rsi_14'] = get_rsi
+						coins[coin]['combined_rsi_cp_metric'] = ((100-coins[coin]['current_potential'])*.25) + (coins[coin]['rsi_14']*.75)
+
 					try:
 						get_hist1day = macd1day.iloc[35, 1]
 					except Exception as e:
@@ -397,7 +415,11 @@ def do_work():
 				if macd_list:
 
 					# print(macd_list)
-					sort_list = sorted(macd_list, key=lambda x: x[f'current_potential'], reverse=True)
+					if RSI_RANKING:						
+						sort_list = sorted(macd_list, key=lambda x: x[f'combined_rsi_cp_metric'])
+					else:
+						sort_list = sorted(macd_list, key=lambda x: x[f'current_potential'], reverse=True)
+
 					for i in sort_list:
 						coin = i['symbol']
 						current_potential = i['current_potential']
