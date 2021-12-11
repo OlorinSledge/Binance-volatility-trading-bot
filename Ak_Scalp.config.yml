@@ -27,26 +27,26 @@ script_options:
 trading_options:
  
   # select your base currency to use for trading (trade for example USDT pairs)
-  PAIR_WITH: USDT
+  PAIR_WITH: USDT #BTC
 
   # Total amount per trade (your base currency balance must be at least TRADE_SLOTS * TRADE_TOTAL)
   # Binance uses a minimum of 10 USDT per trade, add a bit extra to enable selling if the price drops.
   # Recommended: no less than 12 USDT. Suggested: 15 or more.
-  TRADE_TOTAL: 250
+  TRADE_TOTAL: 11 #0.00161373
   
   # Maximum number of trade 'slots' at any time (your USDT balance must be at least TRADE_SLOTS * TRADE_TOTAL)
-  TRADE_SLOTS: 20
+  TRADE_SLOTS: 8
 
   # EX_PAIRS is a list of fiat currencies and margin symbols that I am excluding.
   # Anything added here will be excluded from coin withdrawal and will not be sold.
-  EX_PAIRS: ['PAX', 'EUR', 'GBP', 'JPY', 'USD', 'AUD', 'DOWN', 'UP', 'ONE', 'USDC', 'BNB', 'SHIB', 'VET', 'AXS', 'NEAR', 'GRT', 'SOL', 'MANA', 'DAR', 'IOTX', 'BTC', 'XRP', 'OMG', 'FIL', 'DOGE', 'ETH', 'DOT', 'GTO', 'FLOW', 'THETA', 'AVAX', 'LTC', 'BUSD', 'SLP', 'CELR', 'ZEC', 'ATOM', 'TLM', 'TRX', 'IOTA', 'ALICE', 'SAND', 'COCOS', 'GALA', 'ADA', 'MATIC', 'ENJ', 'LINK', 'DYDX', 'ROSE', 'EGLD', 'LRC', 'FTM', 'CRV', 'SFP', 'AUDIO', 'CHZ', 'MINA', 'MITH', 'CHR', 'WAXP', 'BAT', 'RAMP', 'ENS', 'LUNA', 'TVK', 'ALGO', 'ICP', 'ILV', 'EOS', 'ETC', 'HIVE', 'ATA', 'STORJ', 'SC', 'MBOX', 'ANKR', 'TUSD', 'BCH', 'GTC', 'REQ', 'AION', 'KEY', 'MASK']
+  EX_PAIRS: ['PAX', 'EUR', 'GBP', 'JPY', 'USD', 'AUD', 'DOWN', 'UP', 'ONE', 'USDC', 'BNB', 'SHIB', 'VET', 'AXS', 'NEAR', 'GRT', 'SOL', 'CHR', 'BUSD']
 
   # the amount of time in MINUTES to calculate the difference from the current price (minimum: 1).
   TIME_DIFFERENCE: 1
 
   # Number of times to check for TP/SL during each TIME_DIFFERENCE (minimum: 1).
   # Don't spam the Binance API, you will be banned (max 1200 requests per minute per IP).
-  RECHECK_INTERVAL: 6
+  RECHECK_INTERVAL: 15 #6
 
   # the difference in % between the first and second checks for the price. default 0.25
   CHANGE_IN_PRICE: 100 #0.25
@@ -55,7 +55,7 @@ trading_options:
   STOP_LOSS: 100
 
   # define in % when to take profit on a profitable coin.
-  TAKE_PROFIT: 0.25
+  TAKE_PROFIT: 0.15 #0.25
 
   # Use custom tickers.txt list for filtering pairs.
   # Name of custom tickers list
@@ -93,19 +93,19 @@ trading_options:
   
   # Discord integration
   # Used to push alerts, messages etc to a discord channel
-  MSG_DISCORD: True
+  MSG_DISCORD: False
   
   #restart all modules every hour
   RESTART_MODULES: False
   
   #minimal mode set to 0, complete mode set to 1, termux mode set to 2
-  SCREEN_MODE: 1
-  STATIC_MAIN_INFO: True
+  SCREEN_MODE: 2
+  STATIC_MAIN_INFO: False
   DISABLE_TIMESTAMPS: True  
   SHOW_INITIAL_CONFIG: False
   
   #If the sale time exceeds 6 hours it is automatically added to the black list of currencies. If set to 0 this can be disable
-  MAX_HOLDING_TIME: 6
+  MAX_HOLDING_TIME: 12
   
   SHOW_TABLE_COINS_BOUGHT: True  
   #Thanks to the idea of Norker Play, the table of purchased coins can now be ordered according to the name of the column that we want ... 
@@ -120,15 +120,16 @@ trading_options:
  #Enables the use of currencies with greater or lesser volume
   USE_MOST_VOLUME_COINS: True
   #idea from my psychologist, thanks Sebastian V.
-  COINS_MAX_VOLUME: 5000000000
-  COINS_MIN_VOLUME: 100000000
+  #Two different currencies can be used as a range (within the market table in Binance ordered from highest to lowest)
+  COINS_MAX_VOLUME: BTC #ETH   #5000000000
+  COINS_MIN_VOLUME: DAR #STORJ #100000000
   
   SIGNALLING_MODULES:
     # NOTE: Only use the "os_xxxxxxxxx" or "nigec_xxxxxxxxx" etc signal/pause modules with this fork as 
     # the default ones WILL NOT work due to customisations for my specific purposes
     #
-     - Ak_Scalp
-    #- custsignalmod
+    - Ak_Scalp
+    - custsignalmod
     #- djcommie_signalbuy_rsi_stoch
     #- djcommie_signalsell_rsi_stoch
     #- nigec_signalbuy_RSI

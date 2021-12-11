@@ -24,16 +24,16 @@ config_file = args.config if args.config else DEFAULT_CONFIG_FILE
 parsed_config = load_config(config_file)
 
 USE_MOST_VOLUME_COINS = parsed_config['trading_options']['USE_MOST_VOLUME_COINS']
+PAIR_WITH = parsed_config['trading_options']['PAIR_WITH']
 
-OSC_INDICATORS = ['MACD', 'Stoch.RSI', 'Mom'] # Indicators to use in Oscillator analysis
-OSC_THRESHOLD = 2 # Must be less or equal to number of items in OSC_INDICATORS 
-MA_INDICATORS = ['EMA10', 'EMA20'] # Indicators to use in Moving averages analysis
-MA_THRESHOLD = 2 # Must be less or equal to number of items in MA_INDICATORS 
-INTERVAL = Interval.INTERVAL_5_MINUTES #Timeframe for analysis
+OSC_INDICATORS = ['MACD', 'Stoch.RSI', 'RSI'] # Indicators to use in Oscillator analysis
+OSC_THRESHOLD = 3 # Must be less or equal to number of items in OSC_INDICATORS 
+MA_INDICATORS = ['EMA20', 'EMA100', 'EMA200'] # Indicators to use in Moving averages analysis
+MA_THRESHOLD = 3 # Must be less or equal to number of items in MA_INDICATORS 
+INTERVAL = Interval.INTERVAL_1_MINUTE #Timeframe for analysis
 
 EXCHANGE = 'BINANCE'
 SCREENER = 'CRYPTO'
-PAIR_WITH = 'USDT'
 
 if USE_MOST_VOLUME_COINS == True:
         #if ABOVE_COINS_VOLUME == True:
@@ -91,16 +91,23 @@ def analyze(pairs):
     return signal_coins
 
 def do_work():
-    signal_coins = {}
-    pairs = {}
+    try:
+        signal_coins = {}
+        pairs = {}
 
-    pairs=[line.strip() for line in open(TICKERS)]
-    for line in open(TICKERS):
-        pairs=[line.strip() + PAIR_WITH for line in open(TICKERS)] 
-    
-    while True:
-        if not threading.main_thread().is_alive(): exit()
-        print(f'Custsignalmod: Analyzing {len(pairs)} coins')
-        signal_coins = analyze(pairs)
-        print(f'Custsignalmod: {len(signal_coins)} coins above {OSC_THRESHOLD}/{len(OSC_INDICATORS)} oscillators and {MA_THRESHOLD}/{len(MA_INDICATORS)} moving averages Waiting {TIME_TO_WAIT} minutes for next analysis.')
-        time.sleep((TIME_TO_WAIT*60))
+        pairs=[line.strip() for line in open(TICKERS)]
+        for line in open(TICKERS):
+            pairs=[line.strip() + PAIR_WITH for line in open(TICKERS)] 
+        
+        while True:
+            if not threading.main_thread().is_alive(): exit()
+            print(f'Custsignalmod: Analyzing {len(pairs)} coins')
+            signal_coins = analyze(pairs)
+            print(f'Custsignalmod: {len(signal_coins)} coins above {OSC_THRESHOLD}/{len(OSC_INDICATORS)} oscillators and {MA_THRESHOLD}/{len(MA_INDICATORS)} moving averages Waiting {TIME_TO_WAIT} minutes for next analysis.')
+            time.sleep((TIME_TO_WAIT*60))
+    except Exception as e:
+        print(f'{SIGNAL_NAME}: Exception do_work() 1: {e}')
+        print("Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+        pass
+    except KeyboardInterrupt as ki:
+        pass
