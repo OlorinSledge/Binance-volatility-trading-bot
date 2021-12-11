@@ -25,6 +25,7 @@ config_file = args.config if args.config else DEFAULT_CONFIG_FILE
 parsed_config = load_config(config_file)
 
 USE_MOST_VOLUME_COINS = parsed_config['trading_options']['USE_MOST_VOLUME_COINS']
+PAIR_WITH = parsed_config['trading_options']['PAIR_WITH']
 
 # for colourful logging to the console
 class txcolors:
@@ -40,11 +41,12 @@ INTERVAL5MIN = Interval.INTERVAL_5_MINUTES # Main Timeframe for analysis on Osci
 
 EXCHANGE = 'BINANCE'
 SCREENER = 'CRYPTO'
-PAIR_WITH = 'USDT'
+
 if USE_MOST_VOLUME_COINS == True:
-        TICKERS = "volatile_volume_" + str(date.today()) + ".txt"
+        #if ABOVE_COINS_VOLUME == True:
+    TICKERS = "volatile_volume_" + str(date.today()) + ".txt"
 else:
-        TICKERS = 'tickers.txt'
+    TICKERS = 'tickers.txt'
 
 TIME_TO_WAIT = 1 # Minutes to wait between analysis
 DEBUG = False # List analysis result to console
@@ -97,43 +99,49 @@ def analyze(pairs):
             with open(TRADINGVIEW_EX_FILE,'a+') as f:
                     f.write(pair.removesuffix(PAIR_WITH) + '\n')
             continue
-        
-        SMA20_1MIN = round(analysis1MIN.indicators['SMA20'],4)
-        SMA100_1MIN = round(analysis1MIN.indicators['SMA100'],4)
-        SMA200_1MIN = round(analysis1MIN.indicators['SMA200'],4)
+        try:
+            SMA10_1MIN = round(analysis1MIN.indicators['SMA10'],4)            
+            SMA20_1MIN = round(analysis1MIN.indicators['SMA20'],4)
+            SMA100_1MIN = round(analysis1MIN.indicators['SMA100'],4)
+            SMA200_1MIN = round(analysis1MIN.indicators['SMA200'],4)
 
-        SMA20_5MIN = round(analysis5MIN.indicators['SMA20'],4)
-        SMA100_5MIN = round(analysis5MIN.indicators['SMA100'],4)
-        SMA200_5MIN = round(analysis5MIN.indicators['SMA200'],4)
-        
-        ACTION = 'NOTHING'
-        
-        # Buy condition on the 1 minute indicator
-        if (SMA20_1MIN > SMA100_1MIN) and (SMA100_1MIN > SMA200_1MIN):            
-
-            ACTION = 'BUY'
-
-        if DEBUG:
-            print(f'{SIGNAL_NAME} Signals {pair} {ACTION} - SMA200_1MIN: {SMA200_1MIN} SMA100_1MIN: {SMA100_1MIN} SMA20_1MIN: {SMA20_1MIN}')
-            print(f'{SIGNAL_NAME} Signals {pair} {ACTION} - SMA200_5MIN: {SMA200_5MIN} SMA100_5MIN: {SMA100_5MIN} SMA20_5MIN: {SMA20_5MIN}')
-
-        if ACTION == 'BUY':
-            signal_coins[pair] = pair
-            print(f'{txcolors.BUY}{SIGNAL_NAME}: {pair} - Buy Signal Detected{txcolors.DEFAULT}')
+            SMA10_5MIN = round(analysis5MIN.indicators['SMA10'],4)                                                   
+            SMA20_5MIN = round(analysis5MIN.indicators['SMA20'],4)
+            SMA100_5MIN = round(analysis5MIN.indicators['SMA100'],4)
+            SMA200_5MIN = round(analysis5MIN.indicators['SMA200'],4)
             
-            with open(SIGNAL_FILE_BUY,'a+') as f:
-                f.write(pair + '\n')
+            ACTION = 'NOTHING'
             
-            timestamp = datetime.now().strftime("%d/%m %H:%M:%S")
-            with open(SIGNAL_NAME + '.log','a+') as f:
-                f.write(timestamp + ' ' + pair + '\n')
-                f.write(f'    Signals: {ACTION} - SMA200_1MIN: {SMA200_1MIN} SMA100_1MIN: {SMA100_1MIN} SMA20_1MIN: {SMA20_1MIN}\n')
-                f.write(f'    Signals: {ACTION} - SMA200_5MIN: {SMA200_5MIN} SMA100_5MIN: {SMA100_5MIN} SMA20_5MIN: {SMA20_5MIN}\n')
-                
-        if ACTION == 'NOTHING':
+            # Buy condition on the 1 minute indicator
+            if (SMA10_1MIN > SMA20_1MIN) and (SMA20_1MIN > SMA200_1MIN):
+            #if (SMA20_1MIN > SMA100_1MIN) and (SMA100_1MIN > SMA200_1MIN):            
+
+                ACTION = 'BUY'
+
             if DEBUG:
-                print(f'{SIGNAL_NAME}: {pair} - not enough signal to buy')
-            
+                print(f'{SIGNAL_NAME} Signals {pair} {ACTION} - SMA200_1MIN: {SMA200_1MIN} SMA100_1MIN: {SMA100_1MIN} SMA20_1MIN: {SMA20_1MIN} SMA10_1MIN: {SMA10_1MIN}')
+                print(f'{SIGNAL_NAME} Signals {pair} {ACTION} - SMA200_5MIN: {SMA200_5MIN} SMA100_5MIN: {SMA100_5MIN} SMA20_5MIN: {SMA20_5MIN} SMA10_5MIN: {SMA10_5MIN}')
+
+            if ACTION == 'BUY':
+                signal_coins[pair] = pair
+                print(f'{txcolors.BUY}{SIGNAL_NAME}: {pair} - Buy Signal Detected{txcolors.DEFAULT}')
+                
+                with open(SIGNAL_FILE_BUY,'a+') as f:
+                    f.write(pair + '\n')
+                
+                timestamp = datetime.now().strftime("%d/%m %H:%M:%S")
+                with open(SIGNAL_NAME + '.log','a+') as f:
+                    f.write(timestamp + ' ' + pair + '\n')
+                    f.write(f'    Signals: {ACTION} - SMA200_1MIN: {SMA200_1MIN} SMA100_1MIN: {SMA100_1MIN} SMA20_1MIN: {SMA20_1MIN} SMA10_1MIN: {SMA10_1MIN}\n')
+                    f.write(f'    Signals: {ACTION} - SMA200_5MIN: {SMA200_5MIN} SMA100_5MIN: {SMA100_5MIN} SMA20_5MIN: {SMA20_5MIN} SMA10_5MIN: {SMA10_5MIN}\n')
+                    
+            if ACTION == 'NOTHING':
+                if DEBUG:
+                    print(f'{SIGNAL_NAME}: {pair} - not enough signal to buy')
+        except Exception as e:
+            print(f'{SIGNAL_NAME}Exception analyze() 1:') 
+            print("Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            continue
     return signal_coins
 
 def do_work():
@@ -162,6 +170,7 @@ def do_work():
             time.sleep((TIME_TO_WAIT*60))
         except Exception as e:
             print(f'{SIGNAL_NAME}: Exception do_work() 1: {e}')
+            print("Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             continue
         except KeyboardInterrupt as ki:
             continue
