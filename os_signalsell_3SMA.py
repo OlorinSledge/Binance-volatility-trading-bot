@@ -11,9 +11,6 @@ import glob
 import time
 import threading
 
-# my helper utils
-from helpers.os_utils import(rchop)
-
 # for colourful logging to the console
 class txcolors:
     BUY = '\033[92m'
@@ -89,8 +86,7 @@ def analyze(pairs):
             print (f'handler: {handler1MIN[pair]}')
             print (f'handler2: {handler5MIN[pair]}')
             with open(TRADINGVIEW_EX_FILE,'a+') as f:
-                    #f.write(pair.removesuffix(PAIR_WITH) + '\n')
-                    f.write(rchop(pair, PAIR_WITH) + '\n')
+                    f.write(pair.removesuffix(PAIR_WITH) + '\n')
             continue
         
 

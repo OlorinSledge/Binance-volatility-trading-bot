@@ -7,8 +7,23 @@ import os
 import sys
 # used for directory handling
 import glob
+# used for dates
+from datetime import date, datetime, timedelta
 import time
 import threading
+
+# my helper utils
+from helpers.os_utils import(rchop)
+
+from helpers.parameters import parse_args, load_config
+
+args = parse_args()
+DEFAULT_CONFIG_FILE = 'config.yml'
+
+config_file = args.config if args.config else DEFAULT_CONFIG_FILE
+parsed_config = load_config(config_file)
+
+USE_MOST_VOLUME_COINS = parsed_config['trading_options']['USE_MOST_VOLUME_COINS']
 
 OSC_INDICATORS = ['MACD', 'Stoch.RSI', 'Mom'] # Indicators to use in Oscillator analysis
 OSC_THRESHOLD = 2 # Must be less or equal to number of items in OSC_INDICATORS 
@@ -19,8 +34,15 @@ INTERVAL = Interval.INTERVAL_5_MINUTES #Timeframe for analysis
 EXCHANGE = 'BINANCE'
 SCREENER = 'CRYPTO'
 PAIR_WITH = 'USDT'
-TICKERS = 'signalsample.txt'
-TIME_TO_WAIT = 4 # Minutes to wait between analysis
+
+if USE_MOST_VOLUME_COINS == True:
+        #if ABOVE_COINS_VOLUME == True:
+    TICKERS = "volatile_volume_" + str(date.today()) + ".txt"
+else:
+    TICKERS = 'tickers.txt' #'signalsample.txt'
+    
+#TICKERS = 'signalsample.txt'
+TIME_TO_WAIT = 1 # Minutes to wait between analysis
 FULL_LOG = False # List analysis result to console
 
 def analyze(pairs):

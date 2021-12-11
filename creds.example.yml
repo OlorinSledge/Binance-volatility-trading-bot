@@ -10,6 +10,4 @@ prod:
   access_key: replace_me
   secret_key: replace_me
 discord:
-  # You only need the portion after webhooks
-  # i.e. https://discord.com/api/webhooks/XXX/YYYYY ends up being as below
-  DISCORD_WEBHOOK: XXX/YYYYY
+  DISCORD_WEBHOOK: https://discord.com/api/webhooks/XXX/YYYYY

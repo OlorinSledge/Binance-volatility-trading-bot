@@ -13,8 +13,16 @@ import glob
 import time
 import threading
 
-# my helper utils
-from helpers.os_utils import(rchop)
+from helpers.parameters import parse_args, load_config
+
+args = parse_args()
+DEFAULT_CONFIG_FILE = 'config.yml'
+
+config_file = args.config if args.config else DEFAULT_CONFIG_FILE
+parsed_config = load_config(config_file)
+
+USE_MOST_VOLUME_COINS = parsed_config['trading_options']['USE_MOST_VOLUME_COINS']
+PAIR_WITH = parsed_config['trading_options']['PAIR_WITH']
 
 # for colourful logging to the console
 class txcolors:
@@ -30,12 +38,16 @@ INTERVAL5MIN = Interval.INTERVAL_5_MINUTES # Main Timeframe for analysis on Osci
 
 EXCHANGE = 'BINANCE'
 SCREENER = 'CRYPTO'
-PAIR_WITH = 'USDT'
-TICKERS = 'tickers.txt' #'signalsample.txt'
-TICKERS_OVERRIDE = 'tickers_signalbuy.txt'
+#PAIR_WITH = 'USDT'
+if USE_MOST_VOLUME_COINS == True: 
+    TICKERS = "volatile_volume_" + str(date.today()) + ".txt"
+else:
+    TICKERS = 'tickers.txt' #'signalsample.txt'
 
-if os.path.exists(TICKERS_OVERRIDE):
-    TICKERS = TICKERS_OVERRIDE
+#TICKERS_OVERRIDE = 'tickers_signalbuy.txt'
+
+#if os.path.exists(TICKERS_OVERRIDE):
+#    TICKERS = TICKERS_OVERRIDE
 
 TIME_TO_WAIT = 1 # Minutes to wait between analysis
 DEBUG = False # List analysis result to console
@@ -86,8 +98,7 @@ def analyze(pairs):
             print (f'handler: {handler1MIN[pair]}')
             print (f'handler2: {handler5MIN[pair]}')
             with open(TRADINGVIEW_EX_FILE,'a+') as f:
-                    #f.write(pair.removesuffix(PAIR_WITH) + '\n')
-                    f.write(rchop(pair, PAIR_WITH) + '\n')
+                    f.write(pair.removesuffix(PAIR_WITH) + '\n')
             continue
         
         SMA5_1MIN = round(analysis1MIN.indicators['SMA5'],4)

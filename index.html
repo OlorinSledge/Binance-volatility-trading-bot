@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en">
+  <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>view bot information</title>
+	<style>
+		html {
+			height: 100%;
+		}
+		body {
+			min-height: 100%;
+		}
+	</style>
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript">
+        function ReFunction() {
+            document.getElementById("info1").src = document.getElementById("info1").src
+            document.getElementById("info2").src = document.getElementById("info2").src
+            document.getElementById("info3").src = document.getElementById("info3").src
+            document.getElementById("info4").src = document.getElementById("info4").src
+            
+        }
+		$(document).ready(function(e) {
+			/*var frameRefreshInterval = setInterval(function() {
+				document.getElementById("info1").src = document.getElementById("info1").src
+			}, 10000);
+			var frameRefreshInterval = setInterval(function() {
+				document.getElementById("info2").src = document.getElementById("info2").src
+			}, 2000);
+			var frameRefreshInterval = setInterval(function() {
+				document.getElementById("info3").src = document.getElementById("info3").src
+			}, 2000);
+			var frameRefreshInterval = setInterval(function() {
+				document.getElementById("info4").src = document.getElementById("info4").src
+			}, 2000);
+			console.log("ready");*/
+			$("#modes").change(function(e) {
+				var an = $(this).val();
+				console.log("an");
+				switch(an){
+					case "live": 
+						$("#tinfo1").text("live_history.html");
+						$("#tinfo1").attr("hidden", false);
+						$("#info1").attr("hidden", false);
+						$("#info1").attr("src","live_history.html");
+						$("#info2").attr("hidden", false);
+						$("#info2").attr("src","live_trades.html");
+						$("#tinfo2").text("live_trades.html");
+						$("#tinfo2").attr("hidden", false);
+						$("#info3").attr("hidden", false);
+						$("#info3").attr("src","view_live_bot_stats.html");
+						$("#tinfo3").text("view_live_bot_stats.html");
+						$("#tinfo3").attr("hidden", false);
+						$("#info4").attr("hidden", false);
+						$("#info4").attr("src","view_live_coins_bought.html");
+						$("#tinfo4").text("view_live_coins_bought.html");
+						$("#tinfo4").attr("hidden", false);
+						break;
+					case "simulation": 
+						$("#tinfo1").text("test_history.html");
+						$("#tinfo1").attr("hidden", false);
+						$("#info1").attr("hidden", false);
+						$("#info1").attr("src","test_history.html");
+						$("#info2").attr("hidden", false);
+						$("#info2").attr("src","test_trades.html");
+						$("#tinfo2").text("test_trades.html");
+						$("#tinfo2").attr("hidden", false);
+						$("#info3").attr("hidden", false);
+						$("#info3").attr("src","view_test_bot_stats.html");
+						$("#tinfo3").text("view_test_bot_stats.html");
+						$("#tinfo3").attr("hidden", false);
+						$("#info4").attr("hidden", false);
+						$("#info4").attr("src","view_test_coins_bought.html");
+						$("#tinfo4").text("view_test_coins_bought.html");
+						$("#tinfo4").attr("hidden", false);
+						break;
+					case "none":
+						$("#tinfo1").attr("hidden", true);
+						$("#info1").attr("hidden", true);
+						$("#tinfo2").attr("hidden", true);
+						$("#info2").attr("hidden", true);
+						$("#tinfo3").attr("hidden", true);
+						$("#info3").attr("hidden", true);
+						$("#tinfo3").attr("hidden", true);
+						$("#info4").attr("hidden", true);
+						$("#tinfo4").attr("hidden", true);
+					case "botoutput":
+						$("#tinfo1").text("bot_out_messages.txt");
+						$("#tinfo1").attr("hidden", false);
+						$("#info1").attr("hidden", false);
+						$("#info1").attr("src","bot_out_messages.txt");
+						$("#tinfo2").attr("hidden", true);
+						$("#info2").attr("hidden", true);
+						$("#tinfo3").attr("hidden", true);
+						$("#info3").attr("hidden", true);
+						$("#tinfo3").attr("hidden", true);
+						$("#info4").attr("hidden", true);
+						$("#tinfo4").attr("hidden", true);
+				}
+			});
+		});
+</script>
+  </head>
+  <body>  
+	<h1>view bot information</h1>
+	<select id="modes">
+		<option value="none"> Select One Option </option>
+		<option value="live"> Mode Live - All </option>
+		<option value="simulation"> Mode Simulation - All </option>
+		<option value="botoutput"> Bot Output Online </option>
+	</select>
+    <button onclick="ReFunction()">Refresh Content</button>
+	<h3 id="tinfo1"hidden="true"></h3>
+    <iframe id="info1" src="" width="100%" height="100%" frameborder="0" hidden="true" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" onload="this.style.height=(this.contentWindow.document.body.scrollHeight+20)+'px';">> The file does not exist or was not uploaded yet</iframe>
+	<br>
+	<br>
+	<h3 id="tinfo2" hidden="true"></h3>
+    <iframe id="info2" src="" width="100%" height="100%" frameborder="0" hidden="true" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" onload="this.style.height=(this.contentWindow.document.body.scrollHeight+20)+'px';">>The file does not exist or was not uploaded yet</iframe>
+	<br>
+	<br>
+	<h3 id="tinfo3" hidden="true"></h3>
+    <iframe id="info3" src="view_test_coins_bought.html" width="100%" height="100%"  frameborder="0" hidden="true" sandbox="allow-same-origin allow-scripts allow-popups allow-forms">The file does not exist or was not uploaded yet</iframe>
+	<br>
+	<br>
+	<h3 id="tinfo4" hidden="true"></h3>
+    <iframe id="info4" src="" width="100%" height="100%" frameborder="0" hidden="true" sandbox="allow-same-origin allow-scripts allow-popups allow-forms">The file does not exist or was not uploaded yet</iframe>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+WINDOW INSTALLATION
+
+01} Download and Install Python, https://www.python.org/ftp/python/3.9.6/python-3.9.6-amd64.exe
+
+02} Download and Install https://github.com/git-for-windows/git/releases/download/v2.32.0.windows.2/Git-2.32.0.2-64-bit.exe
+
+03} On the Windows Desktop, for example, create a new text file named commands.txt and add the following lines:
+        @echo off
+        cmd
+        pause
+
+04} Change the extension of the text file (.txt) to .bat
+
+05} Run:
+        git clone https://github.com/pantersxx3/Binance-Bot.git
+        cd Binance-Bot
+
+06} Create account on Binance:
+        https://accounts.binance.com/es-LA/register?ref=175790225
+        
+07} After creating the account go to "API Management" and create an API, write down the two keys that will be delivered.
+
+08} Open the creds.example.yml file and add both keys to each part of the file.
+
+09} Save as creds.yml in the same folder.
+
+10} Open and edit the config.yml file according to your strategy.

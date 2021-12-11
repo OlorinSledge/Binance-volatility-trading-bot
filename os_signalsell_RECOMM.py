@@ -7,11 +7,8 @@ import os
 import sys
 # used for directory handling
 import glob
-import time
 import threading
-
-# my helper utils
-from helpers.os_utils import(rchop)
+import time
 
 MY_EXCHANGE = 'BINANCE'
 MY_SCREENER = 'CRYPTO'
@@ -31,6 +28,7 @@ TRADINGVIEW_EX_FILE = 'tradingview_ta_unknown'
 ###       This is dynamically created based on the coins the bot is currently holding.
 ###
 TICKERS = 'signalsell_tickers.txt'
+SELL_TICKERS = 'signalsell_tickers.txt'
 
 # if DEBUG: TICKERS = 'test_' + TICKERS
 
@@ -89,8 +87,7 @@ def analyze(pairs):
             print (f'Second handler: {second_handler[pair]}')
             print (f'Second handler: {third_handler[pair]}')
             with open(TRADINGVIEW_EX_FILE,'a+') as f:
-                    #f.write(pair.removesuffix(PAIR_WITH) + '\n')
-                    f.write(rchop(pair, PAIR_WITH) + '\n')
+                    f.write(pair.removesuffix(PAIR_WITH) + '\n')
             continue
                
         first_recommendation = first_analysis.summary['RECOMMENDATION']

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+/usr/bin/lxterminal --geometry=140x50 --working-directory=/home/horacio-adm/Binance-volatility-trading-bot_Dragoncity17/ -e "python3.9 Binance\ Detect\ Moonings.py;bash"

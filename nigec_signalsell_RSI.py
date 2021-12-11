@@ -19,9 +19,6 @@ import threading
 from datetime import date, datetime, timedelta
 import time
 
-# my helper utils
-from helpers.os_utils import(rchop)
-
 ########################################################
 # These are the TradingView Oscillator signals available
 ########################################################
@@ -121,8 +118,7 @@ def analyze(pairs):
             print (f'handler2: {handler2[pair]}')
             
             with open(TRADINGVIEW_EX_FILE,'a+') as f:
-                    #f.write(pair.removesuffix(PAIR_WITH) + '\n')
-                    f.write(rchop(pair, PAIR_WITH) + '\n')
+                    f.write(pair.removesuffix(PAIR_WITH) + '\n')
             continue
 
         oscCheck=0

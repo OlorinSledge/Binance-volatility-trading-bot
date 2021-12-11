@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Snail
+Comment=Bull market
+Icon=/home/pi/bots/images/snail.png
+Path=/home/pi/bots/Snail/
+Exec=/usr/bin/python3  /home/pi/bots/Snail/Binance_Detect_Mooningsv1.py
+Type=Application
+Encoding=UTF-8
+Terminal=true
+Categories=None;
+X-KeepTerminal=true
+GenericName=Bull market
+StartupNotify=true

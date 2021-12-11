@@ -1,0 +1,133 @@
+# These options apply to how the script will operate.
+script_options:
+  # Switch between testnet and mainnet
+  # Setting this to False will use REAL funds, use at your own risk
+  TEST_MODE: True
+  LOG_TRADES: True
+  LOG_FILE: 'trades.txt'
+  DEBUG: False
+
+  # Set this to true if you are accessing binance from within the United States of America
+  # Need to change TLD
+  AMERICAN_USER: False
+
+
+# These options apply to the trading methods the script executes
+trading_options:
+ 
+  # select your base currency to use for trading (trade for example USDT pairs)
+  PAIR_WITH: USDT
+
+  # Total amount per trade (your base currency balance must be at least MAX_COINS * QUANTITY)
+  # Binance uses a minimum of 10 USDT per trade, add a bit extra to enable selling if the price drops.
+  # Recommended: no less than 12 USDT. Suggested: 15 or more.
+  QUANTITY: 250
+  
+  # Total amount per trade (your base currency balance must be at least TRADE_SLOTS * TRADE_TOTAL)
+  # Binance uses a minimum of 10 USDT per trade, add a bit extra to enable selling if the price drops.
+  # Recommended: no less than 12 USDT. Suggested: 15 or more.
+  TRADE_TOTAL: 250
+
+  
+  # List of trading pairs to exclude
+  # by default we're excluding the most popular fiat pairs
+  FIATS:
+    - EURUSDT
+    - GBPUSDT
+    - JPYUSDT
+    - USDUSDT
+    - AUDUSDT
+    - DOWN
+    - UP
+
+  # EX_PAIRS is a list of fiat currencies and margin symbols that I am excluding.
+  # Anything added here will be excluded from coin withdrawal and will not be sold.
+  EX_PAIRS: ['EUR', 'USD', 'GBP', 'BUSD', 'USDT', 'AUD', 'BRL', 'RUB', 'TRY', 'USDC', 'PAX', 'BIDR', 'DAI', 'IDRT',
+  'UAH', 'NGN', 'VAI', 'BVND', 'JPY', 'NCASH', 'UPUSDT', 'DOWNUSDT', 'USDTUP', 'USDTDOWN', 'BNBDOWN',
+  'EOSDOWN', 'XLMDOWN', 'UNIDOWN', 'LINKDOWN', 'FILDOWN', 'TRXDOWN', 'XRPDOWN', 'AAVEDOWN', 'SUSHIDOWN',
+  'XTZDOWN', 'ADADOWN', '1INCHDOWN', 'BTCDOWN', 'SXPDOWN', 'DOTDOWN', 'ETHDOWN', 'BCHDOWN', 'LTCDOWN',
+  'YFIDOWN', 'XTZUP', 'DOTUP', 'ADAUP', 'SUPER', 'AAVEUP', 'BTCUP', 'BNBUP', 'SXPUP', 'YFIUP', 'XLMUP',
+  'UNIUP', 'FILUP', '1INCHUP', 'LINKUP', 'LTCUP', 'ETHUP', 'SUSHIUP', 'EOSUP', 'XRPUP', 'TRXUP', 'BCHUP',
+  'RENBTC']
+
+  # Maximum number of trade 'slots' at any time (your USDT balance must be at least TRADE_SLOTS * TRADE_TOTAL)
+  TRADE_SLOTS: 20
+  # Maximum number of trade 'slots' at any time (your USDT balance must be at least MAX_COINS * QUANTITY)
+  MAX_COINS: 15
+
+  # the amount of time in MINUTES to calculate the difference from the current price (minimum: 1).
+  TIME_DIFFERENCE: 1
+
+  # Number of times to check for TP/SL during each TIME_DIFFERENCE (minimum: 1).
+  # Don't spam the Binance API, you will be banned (max 1200 requests per minute per IP).
+  RECHECK_INTERVAL: 6
+
+  # the difference in % between the first and second checks for the price.
+  CHANGE_IN_PRICE: 0.5
+
+  # define in % when to sell a coin that's not making a profit.
+  STOP_LOSS: 5
+
+  # define in % when to take profit on a profitable coin.
+  TAKE_PROFIT: 0.85
+
+  # Use custom tickers.txt list for filtering pairs.
+  CUSTOM_LIST: True
+  # Whether to automatically reload the custom tickers list
+  CUSTOM_LIST_AUTORELOAD: False
+  # Name of custom tickers list
+  TICKERS_LIST: 'tickers.txt'
+     
+   # whether to use trailing stop loss or not; default is True
+  # when hit TAKE_PROFIT, move STOP_LOSS to TRAILING_STOP_LOSS percentage points below TAKE_PROFIT hence locking in profit
+  # when hit TAKE_PROFIT, move TAKE_PROFIT up by TRAILING_TAKE_PROFIT percentage points
+  # NOTE -SELL_ON_SIGNAL_ONLY will override USE_TRAILING_STOP_LOSS
+  USE_TRAILING_STOP_LOSS: True
+  TRAILING_STOP_LOSS: 0.4
+  TRAILING_TAKE_PROFIT: .01
+
+  # Following are used to override SL, TP, TSL & TTP & SELL_ON_SIGNAL_ONLY in the case of a market crash
+  # when hit SESSION_TAKE_PROFIT %, sell all coins and stop bot
+  # when hit SESSION_STOP_LOSS %, sell all coins and stop bot.
+  # Note, SESSION_STOP_LOSS needs to be a NEGATIVE number i.e. -2
+  SESSION_TPSL_OVERRIDE: False
+  SESSION_TAKE_PROFIT: 5
+  SESSION_STOP_LOSS: -2
+
+  # Let a signalling module control sell of coin
+  # NOTE - If USE_TRAILING_STOP_LOSS: True then this needs to be False
+  SELL_ON_SIGNAL_ONLY: False
+
+  # Trading fee in % per trade.
+  # If using 0.075% (using BNB for fees) you must have BNB in your account to cover trading fees.
+  # If using BNB for fees, it MUST be enabled in your Binance 'Dashboard' page (checkbox).
+  TRADING_FEE: 0.075
+
+  # Discord integration
+  # Used to push alerts, messages etc to a discord channel
+  MSG_DISCORD: True
+
+  # This will tell the bot to restart signal modules every hour. This may be useful if for some reason you want to "reset"
+  # signal modules.
+  # In EXTSIGNAL_MODULES put the signalling module you want to restart every hour NOTE: THIS MUST EXIST IN SIGNALLING_MODULES!!!!!
+  RESTART_EXTSIGNALS: False
+  EXTSIGNAL_MODULES:
+    #- os_signalbuy_3SMAv2 
+    - the_snail_v2 
+  
+  
+  SIGNALLING_MODULES:
+    # NOTE: Only use the "os_xxxxxxxxx" or "nigec_xxxxxxxxx" etc signal/pause modules with this fork as 
+    # the default ones WILL NOT work due to customisations for my specific purposes
+    #
+    # - scoobie_signalbuy_thesnailv2
+    # - VolScan
+    # - os_signalbuy_RECOMM
+    # - os_signalsell_RECOMM
+    # - os_signalbuy_3SMAv2
+    # - os_pausebot_MAv2
+    # -scoobie_signalbuy_thesnailv3
+      - the_snail_v2 
+  
+    
+  

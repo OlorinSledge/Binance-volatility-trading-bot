@@ -1,3 +1,6 @@
+# No future support offered, use this script at own risk - test before using real funds
+# If you lose money using this MOD (and you will at some point) you've only got yourself to blame!
+
 from tradingview_ta import TA_Handler, Interval, Exchange
 
 # used for dates
@@ -22,7 +25,6 @@ config_file = args.config if args.config else DEFAULT_CONFIG_FILE
 parsed_config = load_config(config_file)
 
 USE_MOST_VOLUME_COINS = parsed_config['trading_options']['USE_MOST_VOLUME_COINS']
-PAIR_WITH = parsed_config['trading_options']['PAIR_WITH']
 
 # for colourful logging to the console
 class txcolors:
@@ -33,27 +35,21 @@ class txcolors:
     DIM = '\033[2m\033[35m'
     DEFAULT = '\033[39m'
 
+INTERVAL1MIN = Interval.INTERVAL_1_MINUTE # Main Timeframe for analysis on Oscillators and Moving Averages (1 mins)
 INTERVAL5MIN = Interval.INTERVAL_5_MINUTES # Main Timeframe for analysis on Oscillators and Moving Averages (5 mins)
-INTERVAL15MIN = Interval.INTERVAL_15_MINUTES # Main Timeframe for analysis on Oscillators and Moving Averages (15 mins)
 
 EXCHANGE = 'BINANCE'
 SCREENER = 'CRYPTO'
-#PAIR_WITH = 'USDT'
+PAIR_WITH = 'USDT'
 if USE_MOST_VOLUME_COINS == True:
-        #if ABOVE_COINS_VOLUME == True:
-    TICKERS = "volatile_volume_" + str(date.today()) + ".txt"
+        TICKERS = "volatile_volume_" + str(date.today()) + ".txt"
 else:
-    TICKERS = 'tickers.txt' #'signalsample.txt'
+        TICKERS = 'tickers.txt'
 
-#TICKERS_OVERRIDE = 'tickers_signalbuy.txt'
-
-#if os.path.exists(TICKERS_OVERRIDE):
-#    TICKERS = TICKERS_OVERRIDE
-
-TIME_TO_WAIT = 10 # Minutes to wait between analysis
+TIME_TO_WAIT = 1 # Minutes to wait between analysis
 DEBUG = False # List analysis result to console
 
-SIGNAL_NAME = 'os_signalbuys_3SMAv2'
+SIGNAL_NAME = 'Ak_Scalp'
 SIGNAL_FILE_BUY = 'signals/' + SIGNAL_NAME + '.buy'
 
 TRADINGVIEW_EX_FILE = 'tradingview_ta_unknown'
@@ -62,11 +58,11 @@ def analyze(pairs):
 
     signal_coins = {}
 
+    analysis1MIN = {}
+    handler1MIN = {}
+
     analysis5MIN = {}
     handler5MIN = {}
-
-    analysis15MIN = {}
-    handler15MIN = {}
     
     if os.path.exists(SIGNAL_FILE_BUY):
         os.remove(SIGNAL_FILE_BUY)
@@ -75,53 +71,51 @@ def analyze(pairs):
         os.remove(TRADINGVIEW_EX_FILE)
 
     for pair in pairs:
+        handler1MIN[pair] = TA_Handler(
+            symbol=pair,
+            exchange=EXCHANGE,
+            screener=SCREENER,
+            interval=INTERVAL1MIN,
+            timeout= 10)
         handler5MIN[pair] = TA_Handler(
             symbol=pair,
             exchange=EXCHANGE,
             screener=SCREENER,
             interval=INTERVAL5MIN,
             timeout= 10)
-        handler15MIN[pair] = TA_Handler(
-            symbol=pair,
-            exchange=EXCHANGE,
-            screener=SCREENER,
-            interval=INTERVAL15MIN,
-            timeout= 10)
                         
     for pair in pairs:
         try:
+            analysis1MIN = handler1MIN[pair].get_analysis()
             analysis5MIN = handler5MIN[pair].get_analysis()
-            analysis15MIN = handler15MIN[pair].get_analysis()
         except Exception as e:
             print(f'{SIGNAL_NAME}Exception:')
             print(e)
             print (f'Coin: {pair}')
-            print (f'handler: {handler5MIN[pair]}')
-            print (f'handler2: {handler15MIN[pair]}')
+            print (f'handler: {handler1MIN[pair]}')
+            print (f'handler2: {handler5MIN[pair]}')
             with open(TRADINGVIEW_EX_FILE,'a+') as f:
                     f.write(pair.removesuffix(PAIR_WITH) + '\n')
             continue
         
-        SMA20_5MIN = round(analysis5MIN.indicators['SMA20'],4)
-        SMA50_5MIN = round(analysis5MIN.indicators['SMA50'],4)
-        SMA100_5MIN = round(analysis5MIN.indicators['SMA100'],4)
+        SMA20_1MIN = round(analysis1MIN.indicators['SMA20'],4)
+        SMA100_1MIN = round(analysis1MIN.indicators['SMA100'],4)
+        SMA200_1MIN = round(analysis1MIN.indicators['SMA200'],4)
 
-        SMA20_15MIN = round(analysis15MIN.indicators['SMA20'],4)
-        SMA50_15MIN = round(analysis15MIN.indicators['SMA50'],4)
-        SMA100_15MIN = round(analysis15MIN.indicators['SMA100'],4)
+        SMA20_5MIN = round(analysis5MIN.indicators['SMA20'],4)
+        SMA100_5MIN = round(analysis5MIN.indicators['SMA100'],4)
+        SMA200_5MIN = round(analysis5MIN.indicators['SMA200'],4)
         
         ACTION = 'NOTHING'
         
         # Buy condition on the 1 minute indicator
-        if (SMA20_5MIN > SMA50_5MIN) and (SMA50_5MIN > SMA100_5MIN):            
-            # SMA5 = green/white
-            # SMA10 = blue 
-            # SMA100 = red
+        if (SMA20_1MIN > SMA100_1MIN) and (SMA100_1MIN > SMA200_1MIN):            
+
             ACTION = 'BUY'
 
         if DEBUG:
-            print(f'{SIGNAL_NAME} Signals {pair} {ACTION} - SMA100_5MIN: {SMA100_5MIN} SMA50_5MIN: {SMA50_5MIN} SMA20_5MIN: {SMA20_5MIN}')
-            print(f'{SIGNAL_NAME} Signals {pair} {ACTION} - SMA100_15MIN: {SMA100_15MIN} SMA50_15MIN: {SMA50_15MIN} SMA20_15MIN: {SMA20_15MIN}')
+            print(f'{SIGNAL_NAME} Signals {pair} {ACTION} - SMA200_1MIN: {SMA200_1MIN} SMA100_1MIN: {SMA100_1MIN} SMA20_1MIN: {SMA20_1MIN}')
+            print(f'{SIGNAL_NAME} Signals {pair} {ACTION} - SMA200_5MIN: {SMA200_5MIN} SMA100_5MIN: {SMA100_5MIN} SMA20_5MIN: {SMA20_5MIN}')
 
         if ACTION == 'BUY':
             signal_coins[pair] = pair
@@ -133,8 +127,8 @@ def analyze(pairs):
             timestamp = datetime.now().strftime("%d/%m %H:%M:%S")
             with open(SIGNAL_NAME + '.log','a+') as f:
                 f.write(timestamp + ' ' + pair + '\n')
-                f.write(f'    Signals: {ACTION} - SMA100_5MIN: {SMA100_5MIN} SMA50_5MIN: {SMA50_5MIN} SMA20_5MIN: {SMA20_5MIN}\n')
-                f.write(f'    Signals: {ACTION} - SMA100_15MIN: {SMA100_15MIN} SMA50_15MIN: {SMA50_15MIN} SMA20_15MIN: {SMA20_15MIN}\n')
+                f.write(f'    Signals: {ACTION} - SMA200_1MIN: {SMA200_1MIN} SMA100_1MIN: {SMA100_1MIN} SMA20_1MIN: {SMA20_1MIN}\n')
+                f.write(f'    Signals: {ACTION} - SMA200_5MIN: {SMA200_5MIN} SMA100_5MIN: {SMA100_5MIN} SMA20_5MIN: {SMA20_5MIN}\n')
                 
         if ACTION == 'NOTHING':
             if DEBUG:

@@ -1,0 +1,63 @@
+ANDROID INSTALLATION
+
+WARNING: Remember to have the data activated and a good signal, if it is unstable or the connection is lost, the bot will lose information and therefore
+You will lose purchase and sale data.
+
+This guide is for versions from android 7 onwards .... (Termux is not compatible with versions prior to android 7)
+To run our bot on android it is necessary to have the Termux application, for this we are going to download the f-droid apk (the Google Play version does not work)
+https://f-droid.org/packages/com.termux/
+
+Here is the direct link to the latest version (09/22/2021)
+https://f-droid.org/repo/com.termux_117.apk
+
+once downloaded we install it, it may be necessary to enable the option in android "Unknown sources" (this does not represent any risk for the cell phone)
+Open the installed app and start updating the repositories, and installing the necessary package:
+
+pkg update & pkg upgrade
+pkg install openssh net-tools procps nano wget git python
+
+update (updates repositories)
+upgrade (upgrade packages)
+openssh (remote access)
+net-tools (find out IP)
+procps (kill processes)
+nano (to edit files)
+wget (to download files from the internet)
+git (to download the fork)
+python (base language of the bot)
+
+Start and stop SSH daemon
+To start the daemon, that is, listen for connections, it is executed (Note: connections will be listened on port 8022):
+sshd
+
+To kill or stop him, you use:
+pkill sshd
+
+We are already listening for SSH connections, but we still don't know our username, password and IP.
+Find out your username by typing:
+whoami
+
+Now give it a strong password by running:
+passwd
+
+Finally see what IP you have, typing:
+ifconfig
+
+When you have that data you can connect from another place. If you use linux in the client terminal execute:
+ssh USER @ TU_IP -p 8022
+
+From windows you can use Putty https://www.putty.org/ or install ssh for windows https://www.openssh.com/portable.html
+
+we will clone the bot repository as follows in termux
+git clone https://github.com/pantersxx3/Binance-Bot.git
+
+then we write:
+cd Binance-Bot
+
+We update the necessary packages to run the bot as follows
+pip3.9 install --upgrade pip
+pip3.9 install -r requirements.txt
+
+
+To periodically update the bot we execute the command:
+git pull

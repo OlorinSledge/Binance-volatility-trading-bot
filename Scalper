@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Scalper
+Comment=Bull market
+Icon=/home/pi/bots/images/sniper.png
+Path=/home/pi/bots/Scalper/
+Exec=/usr/bin/python3  /home/pi/bots/Scalper/Binance_Detect_Moonings.py
+Type=Application
+Encoding=UTF-8
+Terminal=true
+Categories=None;
+X-KeepTerminal=true
+GenericName=Bull market
+StartupNotify=true

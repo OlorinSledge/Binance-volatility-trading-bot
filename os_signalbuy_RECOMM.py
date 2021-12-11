@@ -9,17 +9,27 @@ import sys
 import glob
 
 import threading
+
+from datetime import date, datetime, timedelta
 import time
 
-# my helper utils
-from helpers.os_utils import(rchop)
+from helpers.parameters import parse_args, load_config
+
+args = parse_args()
+DEFAULT_CONFIG_FILE = 'config.yml'
+
+config_file = args.config if args.config else DEFAULT_CONFIG_FILE
+parsed_config = load_config(config_file)
+
+USE_MOST_VOLUME_COINS = parsed_config['trading_options']['USE_MOST_VOLUME_COINS']
+PAIR_WITH = parsed_config['trading_options']['PAIR_WITH']
 
 MY_EXCHANGE = 'BINANCE'
 MY_SCREENER = 'CRYPTO'
 MY_FIRST_INTERVAL = Interval.INTERVAL_1_MINUTE
 MY_SECOND_INTERVAL = Interval.INTERVAL_5_MINUTES
 MY_THIRD_INTERVAL = Interval.INTERVAL_15_MINUTES
-PAIR_WITH = 'USDT'
+#PAIR_WITH = 'USDT'
 
 TIME_TO_WAIT = 1 # Minutes to wait between analysis
 FULL_LOG = True # List anylysis result to console
@@ -27,11 +37,16 @@ FULL_LOG = True # List anylysis result to console
 SIGNAL_NAME = 'os_signalbuy_RECOMM'
 SIGNAL_FILE = 'signals/' + SIGNAL_NAME + '.buy'
 
-TICKERS = 'tickers.txt'
-TICKERS_OVERRIDE = 'tickers_signalbuy.txt'
+if USE_MOST_VOLUME_COINS == True:
+        #if ABOVE_COINS_VOLUME == True:
+    TICKERS = "volatile_volume_" + str(date.today()) + ".txt"
+else:
+    TICKERS = 'tickers.txt' #'signalsample.txt'
 
-if os.path.exists(TICKERS_OVERRIDE):
-    TICKERS = TICKERS_OVERRIDE
+# = 'tickers_signalbuy.txt'
+
+#if os.path.exists(TICKERS_OVERRIDE):
+#    TICKERS = TICKERS_OVERRIDE
 
 
 TRADINGVIEW_EX_FILE = 'tradingview_ta_unknown'
@@ -91,8 +106,7 @@ def analyze(pairs):
             print (f'Second handler: {second_handler[pair]}')
             print (f'Second handler: {third_handler[pair]}')
             with open(TRADINGVIEW_EX_FILE,'a+') as f:
-                    #f.write(pair.removesuffix(PAIR_WITH) + '\n')
-                    f.write(rchop(pair, PAIR_WITH) + '\n')
+                    f.write(pair.removesuffix(PAIR_WITH) + '\n')
             continue
                
         first_recommendation = first_analysis.summary['RECOMMENDATION']
@@ -134,8 +148,8 @@ def do_work():
             print(f'{SIGNAL_NAME}: {len(signal_coins)} coins with Buy Signals. Waiting {TIME_TO_WAIT} minutes for next analysis.')
 
             time.sleep((TIME_TO_WAIT*60))
-        #except Exception as e:
-        #    print(f'{SIGNAL_NAME}: Exception do_work() 1: {e}')
-        #    continue
+        except Exception as e:
+            print(f'{SIGNAL_NAME}: Exception do_work() 1: {e}')
+            continue
         except KeyboardInterrupt as ki:
             continue
