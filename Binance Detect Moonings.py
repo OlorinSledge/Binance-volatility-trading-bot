@@ -1,6 +1,6 @@
 """
 Olorin Sledge Fork
-Version: 1.27
+Version: 1.28
 
 Disclaimer
 
@@ -40,6 +40,8 @@ FUNCTIONALITY
 - Market profit vs Bot profit comparison
 - Restart an external signal every hour
 - Sell a specific coin on stopping bot funciton
+- Bot can reinvest any profits from coins sold so as to compound your profits. Please note, this will also compound any losses so use with care.
+  Configurable in configy.yml with REINVEST_PROFITS flag.
 
 Added version 1.20:
 - Has a "Market Profit". This is a comparison between your bots profits and if you had just bought BTC instead when you started your bot.
@@ -63,6 +65,9 @@ Added version 1.26:
 
 Added version 1.27
 - Menu system on stopping (CTRL+C) the bot for options to: Exit bot, sell all coins, sell specific coin, resume bot
+
+Added version 1.28
+- Reinvest profits, and losses, to compound capital
 
 DONATIONS
 If you feel you would like to donate to me, for all the above improvements, I would greatly appreciate it. Please see donation options below.
@@ -471,6 +476,8 @@ def balance_report(last_price):
     print(f'--------')
     print(f"STARTED         : {str(bot_started_datetime).split('.')[0]} | Running for: {str(datetime.now() - bot_started_datetime).split('.')[0]}")
     print(f'CURRENT HOLDS   : {len(coins_bought)}/{TRADE_SLOTS} ({float(CURRENT_EXPOSURE):g}/{float(INVESTMENT_TOTAL):g} {PAIR_WITH})')
+    if REINVEST_PROFITS:
+        print(f'ADJ TRADE TOTAL : {TRADE_TOTAL:.2f} (Current TRADE TOTAL adjusted to reinvest profits)')
     print(f'BUYING MODE     : {font if mode == "Live (REAL MONEY)" else txcolors.DEFAULT}{mode}{txcolors.DEFAULT}{txcolors.ENDC}')
     print(f'Buying Paused   : {bot_paused}')
     print(f'')
@@ -707,6 +714,7 @@ def sell_coins(tpsl_override = False, specific_coin_to_sell = ""):
     '''sell coins that have reached the STOP LOSS or TAKE PROFIT threshold'''
     global hsp_head, session_profit_incfees_perc, session_profit_incfees_total, coin_order_id, trade_wins, trade_losses, historic_profit_incfees_perc, historic_profit_incfees_total, sell_all_coins, sell_specific_coin
     
+    global TRADE_TOTAL
     externals = sell_external_signals()
     
     last_price = get_price(False) # don't populate rolling window
@@ -884,6 +892,10 @@ def sell_coins(tpsl_override = False, specific_coin_to_sell = ""):
                 #write_log(f"\tSell\t{coin}\t{coins_sold[coin]['volume']}\t{BuyPrice}\t{PAIR_WITH}\t{LastPrice}\t{profit_incfees_total:.{decimals()}f}\t{PriceChange_Perc:.2f}\t{sell_reason}")
                 write_log(f"\tSell\t{coin}\t{coins_sold[coin]['volume']}\t{BuyPrice}\t{PAIR_WITH}\t{LastPrice}\t{profit_incfees_total:.{decimals()}f}\t{PriceChangeIncFees_Perc:.2f}\t{sell_reason}")
                 
+                #reinvest profits
+                if REINVEST_PROFITS:
+                    TRADE_TOTAL += (profit_incfees_total / TRADE_SLOTS)
+
                 #this is good
                 session_profit_incfees_total = session_profit_incfees_total + profit_incfees_total
                 session_profit_incfees_perc = session_profit_incfees_perc + ((profit_incfees_total/BUDGET) * 100)
@@ -1072,7 +1084,7 @@ def update_bot_stats():
     global trade_wins, trade_losses, historic_profit_incfees_perc, historic_profit_incfees_total
 
     bot_stats = {
-        'total_capital' : str(TRADE_SLOTS * TRADE_TOTAL),
+        'total_capital' : TRADE_SLOTS * TRADE_TOTAL,
         'botstart_datetime' : str(bot_started_datetime),
         'historicProfitIncFees_Percent': historic_profit_incfees_perc,
         'historicProfitIncFees_Total': historic_profit_incfees_total,
@@ -1337,6 +1349,9 @@ if __name__ == '__main__':
     # Used to push alerts, messages etc to a discord channel
     MSG_DISCORD = parsed_config['trading_options']['MSG_DISCORD']
     
+    # Whether the bot should reinvest your profits or not.
+    REINVEST_PROFITS = parsed_config['trading_options']['REINVEST_PROFITS']
+
     # Functionality to "reset / restart" external signal modules
     RESTART_EXTSIGNALS = parsed_config['trading_options']['RESTART_EXTSIGNALS']
     EXTSIGNAL_MODULES = parsed_config['trading_options']['EXTSIGNAL_MODULES']
@@ -1428,6 +1443,9 @@ if __name__ == '__main__':
 
             if total_capital != total_capital_config:
                 historic_profit_incfees_perc = (historic_profit_incfees_total / total_capital_config) * 100
+
+    if REINVEST_PROFITS:
+        TRADE_TOTAL = total_capital / TRADE_SLOTS
 
     # rolling window of prices; cyclical queue
     historical_prices = [None] * (TIME_DIFFERENCE * RECHECK_INTERVAL)

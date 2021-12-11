@@ -88,6 +88,11 @@ trading_options:
   # Used to push alerts, messages etc to a discord channel
   MSG_DISCORD: False
 
+  # Whether the bot should reinvest your profits or not.
+  # If you set to True the bot will dynamically adjust the TRADE_TOTAL (internally to the bot logic, not in this config file)
+  # so as to increase/decrease amount to invest per trade.
+  REINVEST_PROFITS: False
+
   # This will tell the bot to restart signal modules every hour. This may be useful if for some reason you want to "reset"
   # signal modules.
   # In EXTSIGNAL_MODULES put the signalling module you want to restart every hour NOTE: THIS MUST EXIST IN SIGNALLING_MODULES!!!!!
