@@ -29,15 +29,16 @@ import aiohttp
 import asyncio
 import time
 import json
-from datetime import datetime
+import time as t
+from datetime import datetime 
 
-import bt as bt
 from binance.client import Client, BinanceAPIException
 from helpers.parameters import parse_args, load_config
 import pandas as pd
 import pandas_ta as ta
 import ccxt
 import requests
+
 
 # Load creds modules
 from helpers.handle_creds import (
@@ -154,12 +155,22 @@ def analyse_btc():
 	print(f"{btc2:.2f} {btc3:.2f} {btc4:.2f} {btc5:.2f} {btc10:.2f} {btc20:.2f}")
 
 	paused = False
-	if btc2 > btc3 > btc4 > btc5 > btc10 > btc20:
-		paused = False
-		print(f'{SIGNAL_NAME}: Market looks OK')
 
+	now = datetime.now()
+
+	if 0 <= now.weekday() <= 4:
+                if btc2 > btc3 > btc4 > btc5 > btc10 > btc20:
+                    paused = False
+                    print(f'{SIGNAL_NAME}: Market looks OK')
+                else:
+                    print(f'{SIGNAL_NAME}: Market not looking good')
+                    paused = True
+		#if (time(9) <= now.time() <= time(15,30)) or (time(18) <= now.time() <= time(21)) or (time(22) <= now.time() <= time(7)):
+		#else:
+		#print (f'Outside the range  - {now}')
+		#paused = False
 	else:
-		print(f'{SIGNAL_NAME}: Market not looking good')
+		print (f'its a weekend - {now}')
 		paused = True
 
 	return paused
@@ -176,7 +187,7 @@ def do_work():
 			if os.path.isfile(f'signals/{SIGNAL_NAME}.{SIGNAL_TYPE}'):
 				os.remove(f'signals/{SIGNAL_NAME}.{SIGNAL_TYPE}')
 			print(f"Running")
-		time.sleep(30)
+		t.sleep(30)
 
 
 

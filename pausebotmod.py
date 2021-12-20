@@ -8,7 +8,7 @@ INTERVAL = Interval.INTERVAL_1_MINUTE #Timeframe for analysis
 EXCHANGE = 'BINANCE'
 SCREENER = 'CRYPTO'
 SYMBOL = 'BTCUSDT'
-THRESHOLD = 14 # 7 of 15 MA's indicating sell
+THRESHOLD = 7 # 7 of 15 MA's indicating sell
 TIME_TO_WAIT = 1 # Minutes to wait between analysis
 FULL_LOG = False # List analysis result to console
 
@@ -38,6 +38,22 @@ def analyze():
     else:
         print(f'pausebotmod: Market looks ok, bot is running {ma_sell}/{THRESHOLD} Waiting {TIME_TO_WAIT} minutes for next market checkup ')
         paused = False
+
+from datetime import datetime,time 
+
+    now = datetime.now()
+
+    if 0 <= now.weekday() <= 4:
+        print ('its a weekday')
+        if (time(9) <= now.time() <= time(15,30)) or (time(18) <= now.time() <= time(21)) or (time(22) <= now.time() <= time(7)) :
+           print (f'and its in range  - {now}')
+           paused = True
+        else:
+           print (f'outside the range  - {now}')
+           paused = False
+    else:
+       print (f'its a weekend - {now}')
+       paused = False
 
     return paused
 #if __name__ == '__main__':

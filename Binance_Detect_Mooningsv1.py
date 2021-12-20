@@ -410,7 +410,7 @@ def sell_external_signals():
 
 def balance_report(last_price):
 
-    global trade_wins, trade_losses, session_profit_incfees_perc, session_profit_incfees_total
+    global trade_wins, trade_losses, session_profit_incfees_perc, session_profit_incfees_total,unrealised_session_profit_incfees_perc,unrealised_session_profit_incfees_total 
     unrealised_session_profit_incfees_perc = 0
     unrealised_session_profit_incfees_total = 0
 
@@ -1079,7 +1079,7 @@ def update_portfolio(orders, last_price, volume):
             json.dump(coins_bought, file, indent=4)
 
 def update_bot_stats():
-    global trade_wins, trade_losses, historic_profit_incfees_perc, historic_profit_incfees_total
+    global trade_wins, trade_losses, historic_profit_incfees_perc, historic_profit_incfees_total,unrealised_session_profit_incfees_total,unrealised_session_profit_incfees_perc,session_profit_incfees_perc,session_profit_incfees_total,trade_wins,trade_losses
 
     bot_stats = {
         'total_capital' : str(TRADE_SLOTS * TRADE_TOTAL),
@@ -1088,8 +1088,13 @@ def update_bot_stats():
         'historicProfitIncFees_Total': historic_profit_incfees_total,
         'tradeWins': trade_wins,
         'tradeLosses': trade_losses,
-        'market_startprice': market_startprice
+        'market_startprice': market_startprice,
+        'unrealised_session_profit_incfees_total' : unrealised_session_profit_incfees_total,
+        'unrealised_session_profit_incfees_perc' : unrealised_session_profit_incfees_perc,
+        'session_profit_incfees_perc' : session_profit_incfees_perc,
+        'session_profit_incfees_total' :session_profit_incfees_total
     }
+
 
     #save session info for through session portability
     with open(bot_stats_file_path, 'w') as file:
@@ -1112,13 +1117,14 @@ def remove_from_portfolio(coins_sold):
 
 def write_log(logline):
     timestamp = datetime.now().strftime("%y-%m-%d %H:%M:%S")
-
-    if not os.path.exists(LOG_FILE):
+    
+    if not os.path.exists(file_prefix + LOG_FILE):
         with open(LOG_FILE,'a+') as f:
             f.write('Datetime\tType\tCoin\tVolume\tBuy Price\tCurrency\tSell Price\tProfit $\tProfit %\tSell Reason\n')    
 
     with open(LOG_FILE,'a+') as f:
         f.write(timestamp + ' ' + logline + '\n')
+    
 
 def write_signallsell(symbol):
     with open('signalsell_tickers.txt','a+') as f:
