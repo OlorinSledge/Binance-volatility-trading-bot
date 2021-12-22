@@ -41,6 +41,7 @@ creds_file = args.creds if args.creds else DEFAULT_CREDS_FILE
 parsed_creds = load_config(creds_file)
 parsed_config = load_config(config_file)
 
+PAIR_WITH = parsed_config['trading_options']['PAIR_WITH']
 TEST_MODE = parsed_config['script_options'].get('TEST_MODE')
 prefix = 'live_'
 if TEST_MODE:
@@ -97,7 +98,7 @@ with open(coins_bought_file_path, 'r') as f:
         info = client.get_symbol_info(coin)
         step_size = float(info['filters'][2]['stepSize'])
         tick_size = float(info['filters'][0]['tickSize'])
-
+        
         #calculate the OCO prices
         BuyPrice = float(coins[coin]['bought_at'])
         SellPrice = round_step_size(((BuyPrice * (coins[coin]['take_profit']/100)) + BuyPrice),tick_size)
@@ -135,5 +136,6 @@ with open(coins_bought_file_path, 'r') as f:
             print(console_log_text)
 
             if LOG_TRADES:
-                timestamp = datetime.now().strftime("%d/%m %H:%M:%S")
-                write_log(f"Sell OCO: {coins[coin]['volume']} {coin} - {BuyPrice} - {LastPrice} Profit: {profit:.2f} {PriceChange:.2f}%")
+                write_log(f"\tSell\t{coin}\t{coins[coin]['volume']}\t{BuyPrice}\t{PAIR_WITH}\t{LastPrice}\t{profit:.2f}\t{total_price_change:.2f}\tCreate Sell OCO")
+
+
