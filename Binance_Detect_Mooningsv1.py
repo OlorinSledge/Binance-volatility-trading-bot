@@ -1118,7 +1118,7 @@ def remove_from_portfolio(coins_sold):
 def write_log(logline):
     timestamp = datetime.now().strftime("%y-%m-%d %H:%M:%S")
     
-    if not os.path.exists(file_prefix + LOG_FILE):
+    if not os.path.exists(LOG_FILE):
         with open(LOG_FILE,'a+') as f:
             f.write('Datetime\tType\tCoin\tVolume\tBuy Price\tCurrency\tSell Price\tProfit $\tProfit %\tSell Reason\n')    
 
