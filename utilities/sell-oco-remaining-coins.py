@@ -99,26 +99,43 @@ with open(coins_bought_file_path, 'r') as f:
         step_size = float(info['filters'][2]['stepSize'])
         tick_size = float(info['filters'][0]['tickSize'])
         
+        #Get current price to check StopPx
+        LastTradePrice = client.get_ticker(coin)["lastPrice"]
+               
         #calculate the OCO prices
         BuyPrice = float(coins[coin]['bought_at'])
         SellPrice = round_step_size(((BuyPrice * (coins[coin]['take_profit']/100)) + BuyPrice),tick_size)
         StopOrderTrigger = round_step_size(((BuyPrice * (coins[coin]['stop_loss']/100)) + BuyPrice),tick_size)
         StopOrderPrice = round_step_size(((BuyPrice * (coins[coin]['stop_loss']/100)) + BuyPrice),tick_size)
-        print(f"Sell OCO: {coins[coin]['volume']} {coin} - {BuyPrice} - {SellPrice} - {StopOrderTrigger} - {StopOrderPrice}")
+        print(f"Sell OCO: {coins[coin]['volume']} {coin} - BP: {BuyPrice} - SP: {SellPrice} - SOT: {StopOrderTrigger} - SOP: {StopOrderPrice} - LP: {LastTradePrice}")
 
         try:
-            sell_coin = client.create_oco_order(
-                symbol = coin,
-                side = 'SELL',        
-                quantity = coins[coin]['volume'],        
-                price = SellPrice,
-                stopPrice = StopOrderTrigger,
-                stopLimitPrice = StopOrderPrice,
-                stopLimitTimeInForce = 'GTC'
-            )
+            if StopOrderPrice > LastTradePrice:
+                #Stop price is higher then we can't create OCO/Stop order - create sell limit 
+                sell_coin = client.create_order(
+                                symbol = coin,
+                                side = 'SELL',
+                                type = 'LIMIT',
+                                price = SellPrice,
+                                timeInForce="GTC",
+                                quantity = coins[coin]['volume']
+                            )
+                SellType = " LONG "
+            else:
+                sell_coin = client.create_oco_order(
+                    symbol = coin,
+                    side = 'SELL',        
+                    quantity = coins[coin]['volume'],        
+                    price = SellPrice,
+                    stopPrice = StopOrderTrigger,
+                    stopLimitPrice = StopOrderPrice,
+                    stopLimitTimeInForce = 'GTC'
+                )
+                SellType = " OCO "
+
         except BinanceAPIException as e:
             print(e)
-    
+     
         else: 
             remove_from_portfolio(coin)
 
@@ -136,6 +153,5 @@ with open(coins_bought_file_path, 'r') as f:
             print(console_log_text)
 
             if LOG_TRADES:
-                write_log(f"\tSell\t{coin}\t{coins[coin]['volume']}\t{BuyPrice}\t{PAIR_WITH}\t{LastPrice}\t{profit:.2f}\t{total_price_change:.2f}\tCreate Sell OCO")
-
+                write_log(f"\tSell\t{coin}\t{coins[coin]['volume']}\t{BuyPrice}\t{PAIR_WITH}\t{LastPrice}\t{profit:.2f}\t{total_price_change:.2f}\tCreate {SellType} Sell")
 
