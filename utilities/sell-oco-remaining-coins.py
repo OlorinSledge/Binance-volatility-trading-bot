@@ -46,7 +46,7 @@ prefix = 'live_'
 if TEST_MODE:
     prefix = 'test_'
 
-coins_bought_file_path = prefix + 'coins_bought.json'
+coins_bought_file_path = '../' + prefix + 'coins_bought.json'
 LOG_TRADES = parsed_config['script_options'].get('LOG_TRADES')
 LOG_FILE = parsed_config['script_options'].get('LOG_FILE')
 LOG_FILE_PATH = '../' + prefix + LOG_FILE
@@ -71,9 +71,7 @@ def write_log(logline):
 
 def remove_from_portfolio(coins_sold):
     '''Remove coins sold due to OCO from portfolio'''
-    for coin in coins_sold:
-        # code below created by getsec <3
-        coins_bought.pop(coin)
+    coins_bought.pop(coins_sold)
     with open(coins_bought_file_path, 'w') as file:
         json.dump(coins_bought, file, indent=4)
     if os.path.exists('signalsell_tickers.txt'):
@@ -82,9 +80,7 @@ def remove_from_portfolio(coins_sold):
             #write_signallsell(coin.removesuffix(PAIR_WITH))
             write_signallsell(rchop(coin, PAIR_WITH))
     
-
-
-with open('../' + prefix + 'coins_bought.json', 'r') as f:
+with open(coins_bought_file_path, 'r') as f:
     coins = json.load(f)
     total_profit = 0
     total_price_change = 0
@@ -123,11 +119,9 @@ with open('../' + prefix + 'coins_bought.json', 'r') as f:
             print(e)
     
         else: 
-            coins_sold = {}
-            coins_sold = coin
-            remove_from_portfolio(coins_sold)
+            remove_from_portfolio(coin)
 
-            # OCO is not executed at this time so using SellPrice for Reference 
+            #OCO is not executed at this time so using SellPrice for Reference 
             LastPrice = SellPrice
                 
             profit = (LastPrice - BuyPrice) * coins[coin]['volume']
