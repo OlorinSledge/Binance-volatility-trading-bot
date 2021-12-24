@@ -100,7 +100,7 @@ with open(coins_bought_file_path, 'r') as f:
         tick_size = float(info['filters'][0]['tickSize'])
         
         #Get current price to check StopPx
-        LastTradePrice = client.get_ticker(coin)["lastPrice"]
+        LastTradePrice =float(client.get_symbol_ticker(symbol=coin)['price'])
                
         #calculate the OCO prices
         BuyPrice = float(coins[coin]['bought_at'])
@@ -154,4 +154,3 @@ with open(coins_bought_file_path, 'r') as f:
 
             if LOG_TRADES:
                 write_log(f"\tSell\t{coin}\t{coins[coin]['volume']}\t{BuyPrice}\t{PAIR_WITH}\t{LastPrice}\t{profit:.2f}\t{total_price_change:.2f}\tCreate {SellType} Sell")
-
